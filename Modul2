@@ -1,0 +1,95 @@
+class Buku:
+    def __init__(self, judul, tersedia=True):
+        self.judul = judul
+        self.tersedia = tersedia
+
+class Admin:
+    def __init__(self):
+        self.daftar_buku = []
+
+    def input_buku(self, judul):
+        buku = Buku(judul)
+        self.daftar_buku.append(buku)
+
+class User:
+    def __init__(self, nama, nim):
+        self.nama = nama
+        self.nim = nim
+        self.buku_dipinjam = []
+
+    def pinjam_buku(self, buku):
+        if buku.tersedia:
+            buku.tersedia = False
+            self.buku_dipinjam.append(buku)
+            print(f"{self.nama} telah meminjam buku dengan judul: {buku.judul}")
+        else:
+            print("Buku tidak tersedia untuk dipinjam")
+
+    def kembalikan_buku(self, buku):
+        if buku in self.buku_dipinjam:
+            buku.tersedia = True
+            self.buku_dipinjam.remove(buku)
+            print(f"{self.nama} telah mengembalikan buku dengan judul: {buku.judul}")
+        else:
+            print(f"{self.nama} tidak meminjam buku ini")
+
+def main():
+    admin = Admin()
+
+    # Inputkan beberapa buku oleh admin
+    admin.input_buku("Book A")
+    admin.input_buku("Book B")
+    admin.input_buku("Book C")
+
+    users = [
+        User("User1", "NIM1"),
+        User("User2", "NIM2"),
+        User("User3", "NIM3")
+    ]
+
+    while True:
+        print("\nPilihan:")
+        print("1. Masuk sebagai Admin")
+        print("2. Masuk sebagai User")
+        print("3. Keluar")
+        pilihan = input("Pilih: ")
+
+        if pilihan == '1':
+            judul = input("Masukkan judul buku: ")
+            admin.input_buku(judul)
+        elif pilihan == '2':
+            print("Pilih user:")
+            for i, user in enumerate(users):
+                print(f"{i + 1}. {user.nama}")
+            user_choice = int(input("Pilih user (nomor): ")) - 1
+
+            if user_choice >= 0 and user_choice < len(users):
+                user = users[user_choice]
+                if not admin.daftar_buku:
+                    print("Tidak ada buku yang tersedia saat ini.")
+                else:
+                    for idx, buku in enumerate(admin.daftar_buku):
+                        print(f"{idx + 1}. {buku.judul}")
+                    pilihan_buku = int(input("Pilih buku yang ingin dipinjam (nomor): ")) - 1
+                    user.pinjam_buku(admin.daftar_buku[pilihan_buku])
+                    
+                    pilihan_kembali = input("Apakah Anda ingin mengembalikan buku? (y/n): ")
+                    if pilihan_kembali.lower() == 'y':
+                        if user.buku_dipinjam:
+                            for idx, buku in enumerate(user.buku_dipinjam):
+                                print(f"{idx + 1}. {buku.judul}")
+                            pilihan_buku_kembali = int(input("Pilih buku yang ingin dikembalikan (nomor): ")) - 1
+                            user.kembalikan_buku(user.buku_dipinjam[pilihan_buku_kembali])
+                        else:
+                            print("Anda tidak memiliki buku untuk dikembalikan.")
+                    elif pilihan_kembali.lower() != 'n':
+                        print("Pilihan tidak valid.")
+            else:
+                print("Pilihan user tidak valid.")
+        elif pilihan == '3':
+            break
+        else:
+            print("Pilihan tidak valid")
+
+if __name__ == "__main__":
+    main()
